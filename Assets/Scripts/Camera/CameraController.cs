@@ -24,7 +24,7 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = player.transform.position + new Vector3(0.0f,0.3f,0.0f);
+        transform.position = player.transform.position + new Vector3(0.0f,1.0f,0.0f);
 
         //마우스의 xy값 받아오기
         float mouseX = Input.GetAxisRaw("Mouse X") * Time.deltaTime * sensitivityX;

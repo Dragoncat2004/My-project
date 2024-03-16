@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
@@ -9,6 +11,7 @@ public class PlayerController : MonoBehaviour
 
     GameObject cameraObject;
     Transform cameraRotation;
+    public GameObject playerAttack;
 
     //status
     private float moveSpeed = 0;
@@ -28,6 +31,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Movement();   
+        Attack();
     }
 
     void Movement()
@@ -49,12 +53,23 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddRelativeForce(new Vector3(0, 0, -moveSpeed));
         }
-        if(Input.GetKey(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Space) && onCollision)
         {
             rb.AddForce(new Vector3(0, jumpSpeed, 0));
         }
+    }
 
-        //rb.velocity = new Vector3(rb.velocity.x * 0.97f, rb.velocity.y, rb.velocity.z * 0.97f);
+    void Attack()
+    {
+        if (Input.GetMouseButton(0))
+        {
+            playerAttack.SetActive(true);
+        }
+        else
+        {
+            playerAttack.SetActive(false);
+        }
+        
     }
 
     void UpdateStatus()
@@ -66,62 +81,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        onCollision = true;
+        if (collision.gameObject.tag == "Obstacle")
+        {
+            SceneManager.LoadScene(0);
+        }
+        
+        
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Wall")
+        {
+            onCollision = true;
+            rb.AddForce(new Vector3(0.0f, 3.0f, 0.0f));
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Wall") onCollision = false;
     }
 }
-
-/*
- if (Input.GetKey(KeyCode.A))
-        {
-            rb.velocity += new Vector3(-moveSpeed, 0.0f, 0.0f);
-            if (rb.velocity.x < -moveSpeed)
-            {
-                rb.velocity = new Vector3(-moveSpeed, rb.velocity.y, rb.velocity.z);
-            }
-        }else if (rb.velocity.x < 0)
-        {
-            rb.velocity = new Vector3(rb.velocity.x * drag, rb.velocity.y, rb.velocity.z);
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            rb.velocity += new Vector3(moveSpeed, 0.0f, 0.0f);
-            if (rb.velocity.x > moveSpeed)
-            {
-                rb.velocity = new Vector3(moveSpeed, rb.velocity.y, rb.velocity.z);
-            }
-        }
-        else if (rb.velocity.x > 0)
-        {
-            rb.velocity = new Vector3(rb.velocity.x * drag, rb.velocity.y, rb.velocity.z);
-        }
-        if (Input.GetKey(KeyCode.W))
-        {
-            rb.velocity += new Vector3(0.0f, 0.0f, moveSpeed);
-            if (rb.velocity.z > moveSpeed)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, moveSpeed);
-            }
-        }
-        else if (rb.velocity.z > 0)
-        {
-            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, rb.velocity.z * drag);
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            rb.velocity += new Vector3(0.0f, 0.0f, -moveSpeed);
-            if (rb.velocity.z < -moveSpeed)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, -moveSpeed);
-            }
-        }
-        else if (rb.velocity.z < 0)
-        {
-            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, rb.velocity.z * drag);
-        }
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            rb.velocity += new Vector3(0.0f,jumpSpeed,0.0f);
-            Debug.Log(rb.velocity.y);
-        }
-        onCollision = false;
- */
