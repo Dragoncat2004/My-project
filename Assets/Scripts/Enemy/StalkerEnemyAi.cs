@@ -8,8 +8,14 @@ public class StalkerEnemyAi : MonoBehaviour
     GameObject player;
 
     Rigidbody rb;
-    float moveSpeed = 0.0f;
-    float jumpSpeed = 0.0f;
+    float moveSpeed;
+    float jumpSpeed;
+    float dashCooltime;
+    float dashCooltimeTimer = 0.0f;
+    float attackDemage;
+
+    float maxHp;
+    float hp;
 
     bool onCollision = false;
     void Start()
@@ -18,12 +24,16 @@ public class StalkerEnemyAi : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         moveSpeed = GetComponent<EnemyStatus>().moveSpeed;
         jumpSpeed = GetComponent<EnemyStatus>().jumpSpeed;
+        maxHp = GetComponent<EnemyStatus>().maxHp;
+        hp = maxHp;
+        dashCooltime = GetComponent<EnemyStatus>().dashCooltime;
     }
 
     // Update is called once per frame
     void Update()
     {
         Movement();
+        Dash();
     }
 
     void Movement()
@@ -36,11 +46,20 @@ public class StalkerEnemyAi : MonoBehaviour
         }
     }
 
+    void Dash()
+    {
+        dashCooltimeTimer += Time.deltaTime;
+        if (dashCooltimeTimer > dashCooltime)
+        {
+            rb.AddRelativeForce(Vector3.forward * 100.0f);
+            dashCooltimeTimer = 0.0f;
+        }
+        
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Wall") onCollision = true;
-        
-        
     }
 
     private void OnCollisionExit(Collision collision)
@@ -52,8 +71,17 @@ public class StalkerEnemyAi : MonoBehaviour
     {
         if (other.gameObject.tag == "PlayerAttack")
         {
-            rb.AddRelativeForce(new Vector3(0.0f, 0.0f, moveSpeed * -1000.0f));
-            Debug.Log("A");
+            OnDemaged(other.gameObject.GetComponent<BulletController>().attackDemage);
         }
+    }
+
+    void OnDemaged(float demage)
+    {
+        hp -= demage;
+        if (hp < 0.0f)
+        {
+            Destroy(gameObject);
+        }
+        rb.AddRelativeForce(new Vector3(0.0f, 0.0f, moveSpeed * -50.0f));
     }
 }

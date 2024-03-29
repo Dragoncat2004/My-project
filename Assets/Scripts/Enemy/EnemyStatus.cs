@@ -6,6 +6,9 @@ public class EnemyStatus : MonoBehaviour
 {
     public float moveSpeed;
     public float jumpSpeed;
+    public float maxHp;
+    public float dashCooltime;
+    public float attackDemage;
     void Start()
     {
         

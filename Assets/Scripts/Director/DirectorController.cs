@@ -7,9 +7,12 @@ public class DirectorController : MonoBehaviour
     public GameObject stalker;
 
     float timer = 0.0f;
+
+    public float maxGeneration;
+
     void Start()
     {
-        
+        Application.targetFrameRate = 120;
     }
 
     // Update is called once per frame
@@ -18,7 +21,12 @@ public class DirectorController : MonoBehaviour
         timer += Time.deltaTime;
         if (timer > 1.0f)
         {
-            Instantiate(stalker);
+            GameObject[] enemy = GameObject.FindGameObjectsWithTag("Obstacle");
+            if (enemy.Length < maxGeneration )
+            {
+                Instantiate(stalker);
+            }
+            
             timer = 0.0f;
         }
     }
