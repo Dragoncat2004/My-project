@@ -1,45 +1,49 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SearchService;
+//using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.VFX;
 
 public class PlayerController : MonoBehaviour
 {
+    public GameObject cameraObject;
+    Transform cameraRotation;
+
+    public GameObject gameDirector;
+    
+    //get Component
+    ParticleSystem particle;
     Rigidbody rb;
 
-    GameObject cameraObject;
-    Transform cameraRotation;
-    public GameObject playerAttack;
-    public GameObject playerRangeAttack;
-
     //status
-    private float moveSpeed = 0;
-    private float jumpSpeed = 0;
-    private float gravityScale = 0;
-    float attackDemage;
-    float attackSpeed;
-    float attackCooltime;
-    float maxHp;
-    public float hp;
+    private float moveSpeed;
+    private float jumpSpeed;
+    private float gravityScale;
+    public float airTime;
 
+    //ability
+    private int jumpCountMax = 1;
+    public int jumpCount = 0;
 
     //script
     private bool onCollision = false;
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        cameraObject = GameObject.Find("Main Camera");
         cameraRotation = cameraObject.GetComponent<CameraController>().orientation;
+        particle = GetComponent<ParticleSystem>();
         UpdateStatus();
-        hp = maxHp;
+        
     }
 
     void Update()
     {
-        Movement();   
-        Attack();
+        if (Time.timeScale != 0.0f)
+        {
+            Movement();
+            GravityScale();
+        }
     }
 
     void Movement()
@@ -61,66 +65,40 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddRelativeForce(new Vector3(0, 0, -moveSpeed));
         }
-        if(Input.GetKeyDown(KeyCode.Space) && onCollision)
+        if(Input.GetKeyDown(KeyCode.Space) && (jumpCount < jumpCountMax))
         {
-            rb.AddForce(new Vector3(0, jumpSpeed, 0));
+            rb.velocity = new Vector3 (rb.velocity.x, 10 * jumpSpeed, rb.velocity.z);
+            rb.AddRelativeForce(Vector3.forward * moveSpeed);
+            //rb.AddForce(new Vector3(0, jumpSpeed, 0));
+            jumpCount++;
             onCollision = false;
         }
     }
 
-    void Attack()
+    void GravityScale()
     {
-        if (Input.GetMouseButton(1))
+        if(rb.velocity.y >= 0.0f || onCollision)
         {
-            playerAttack.SetActive(true);
+            airTime = 0.0f;
         }
         else
         {
-            playerAttack.SetActive(false);
-        }
-        if (Input.GetMouseButton(0))
-        {
-            if(attackCooltime <= 0)
-            {
-                GameObject rangeAttack = Instantiate(playerRangeAttack);
-                rangeAttack.transform.position = cameraObject.transform.position;
-                rangeAttack.transform.rotation = cameraObject.transform.rotation;
-                rangeAttack.transform.Translate(new Vector3(0.0f, 0.0f, 1.0f));
-                rangeAttack.GetComponent<BulletController>().attackDemage = attackDemage;
-                rangeAttack.GetComponent<Rigidbody>().AddForce(cameraObject.transform.forward * 1000.0f);
-                attackCooltime = attackSpeed;
-            }
-            attackCooltime -= Time.deltaTime;
+            airTime += airTime >= 5.0f ?  0.0f : Time.deltaTime; 
+            rb.AddForce(new Vector3 (0, -airTime * gravityScale, 0));
         }
     }
-
-    void UpdateStatus()
+    public void UpdateStatus()
     {
         this.moveSpeed = GetComponent<PlayerStatus>().moveSpeed;
         this.jumpSpeed = GetComponent<PlayerStatus>().jumpSpeed;
         this.gravityScale = GetComponent<PlayerStatus>().gravityScale;
-        attackSpeed = GetComponent<PlayerStatus>().attackSpeed;
-        attackDemage = GetComponent<PlayerStatus>().attackDemage;
-        maxHp = GetComponent<PlayerStatus>().maxHp;
-
+        this.jumpCountMax = GetComponent<PlayerStatus>().jumpCount;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    public void GetKnockback(GameObject target)
     {
-        if (collision.gameObject.tag == "Obstacle")
-        {
-            rb.AddForce(collision.gameObject.transform.forward * 100.0f);
-            hp -= collision.gameObject.GetComponent<EnemyStatus>().attackDemage;
-            if (hp <= 0)
-            {
-                Die();
-            }
-        }
-    }
-
-    void Die()
-    {
-        SceneManager.LoadScene(0);
+        rb.AddForce(target.transform.forward * 100.0f);
+        particle.Play();
     }
 
     private void OnCollisionStay(Collision collision)
@@ -128,7 +106,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Wall")
         {
             onCollision = true;
-            //rb.AddForce(new Vector3(0.0f, 3.0f, 0.0f));
+            jumpCount = 0;
         }
     }
 

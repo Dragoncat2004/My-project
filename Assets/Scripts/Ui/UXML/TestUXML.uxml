@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/TestCss.uss?fileID=7433441132597879392&amp;guid=b57e2656590552e4fa44be32f5036cb0&amp;type=3#TestCss" />
+    <ui:VisualElement name="Container" style="flex-grow: 1;">
+        <ui:VisualElement name="GameName" style="flex-grow: 1; top: auto; height: 30%; min-height: 0; max-height: 30%; max-width: none;">
+            <ui:Label tabindex="-1" text="3D Vamsir-Like" parse-escape-sequences="true" display-tooltip-when-elided="true" name="GameNameText" class="title" style="justify-content: center; align-self: center; height: auto; width: auto; -unity-font: url(&apos;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Electronic%20Highway%20Sign.TTF?fileID=12800000&amp;guid=8a2b9e2a607dd2143b58c44bc32410b4&amp;type=3#Electronic Highway Sign&apos;); -unity-font-definition: initial; font-size: 128px; -unity-text-align: middle-center; -unity-font-style: bold; top: 30%;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="Buttons" style="flex-grow: 1;">
+            <ui:Button text="Start" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Start" class="button hovering" style="left: 82%; top: 30%;" />
+            <ui:Button text="Setting" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Setting" class="button hovering" style="top: 40%;" />
+            <ui:Button text="Customize" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Customize" class="button hovering" style="top: 50%;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
